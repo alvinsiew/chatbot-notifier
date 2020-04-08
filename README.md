@@ -5,9 +5,9 @@ chatbot-notifier aims to make sending notification to telegram chat group in an 
 
 ## How it works
 
-chatbot-notifier uses aws-sdk-go to implement the encryption and decryption operation. Thus you will require an amazon web services access key id and secret access key. Similar to using terraform or terragrunt, AWS_PROFILE have to be pass in the command line. Example will be "AWS_PROFILE=<PROFILE NAME> notifier send -f credential.yml -m textfile.txt". This profile read from <HOME>/.aws/credentials. If the access key id and secret access key are set as default profile in <HOME>/.aws/credentials, then AWS_PROFILE will not need to be pass. Example "notifier send -f credential.yml -m textfile.txt".
+chatbot-notifier uses aws-sdk-go to implement the encryption and decryption operation. Thus you will require an amazon web services access key id and secret access key. Similar to using terraform or terragrunt, AWS_PROFILE have to be pass in the command line. Example will be "AWS_PROFILE=<PROFILE NAME> notifier send -f credential.yml -m textfile.txt". This profile read from ~/.aws/credentials. If the access key id and secret access key are set as default profile in ~/.aws/credentials, then AWS_PROFILE will not need to be pass. Example "notifier send -f credential.yml -m textfile.txt".
 
-Example of <HOME>/.aws/credential
+Example of ~/.aws/credential
 
 ```aws
 [default]
@@ -15,7 +15,7 @@ role_arn = arn:aws:iam::123456789012:role/testing
 source_profile = default
 role_session_name = OPTIONAL_SESSION_NAME
 
-[profile project1]
+[profile_project1]
 role_arn = arn:aws:iam::123456789012:role/testing
 source_profile = default
 role_session_name = OPTIONAL_SESSION_NAME
@@ -31,23 +31,44 @@ notifier will then be able to send message using credential.yml. <br/>
 
 ### Encrypt credential.yml
 
-notifier encrypt -f credential.yml <br/>
+```bash
+notifier encrypt -f credential.yml
 
-or <br/>
+or
 
-AWS_PROFILE=PROFILE1 notifier encrypt -f credential.yml <br/>
+AWS_PROFILE=profile_project1 notifier encrypt -f credential.yml
+```
 
 ### Message can only be send after encryption
 
-notifier send -f credential.yml -m message.txt <br/>
+Sending message file content to chat group
 
-or <br/>
+```bash
+notifier send -f credential.yml -m message.txt
 
-AWS_PROFILE=PROFILE2 notifier send -f credential.yml -m message.txt <br/>
+or
+
+AWS_PROFILE=profile_project1 notifier send -f credential.yml -m message.txt
+
+```
+
+Sending text message to chat group
+
+```bash
+notifier text -f credential.yml -m "Hello World"
+
+or
+
+AWS_PROFILE=profile_project1 notifier text -f credential.yml -m "Hello World"
+
+```
 
 ## credential.yml format (SAMPLE NOT REAL INFOR) (File can be other name)
 
-```go
+For more information on how to get token, see <https://core.telegram.org/bots#6-botfather>
+To get your chat id, update the URL with your bot token <https://api.telegram.org/bot< token >/getUpdates>
+
+```yaml
 aws:
 - arn: arn:aws:kms:ap-southeast-1:XXXXXXXXXX:key/XXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXX
 telegram:
@@ -58,3 +79,18 @@ telegram:
 ## message.txt (File can be other name)
 
 Any free text file.
+
+### Self-compile
+
+```bash
+git clone https://github.com/GovTechSG/chatbot-notifier.git
+
+# MacOS
+env GOOS=darwin GOARCH=amd64 go build -o notifier cmd/notifier/main.go
+
+# Linux
+env GOOS=linux GOARCH=amd64 go build -o notifier cmd/notifier/main.go
+
+# Window
+env GOOS=windows GOARCH=amd64 go build -o notifier cmd/notifier/main.go
+```
